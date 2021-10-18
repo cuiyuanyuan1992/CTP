@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.TpBuildMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="tpBuildResultMap" type="org.example.entity.TpBuild">
+        <id column="id" property="id"/>
+        <result column="created" property="created"/>
+        <result column="updated" property="updated"/>
+        <result column="deleted" property="deleted"/>
+        <result column="job_id" property="jobId"/>
+        <result column="job_name" property="jobName"/>
+        <result column="job_type" property="jobType"/>
+        <result column="build_number" property="buildNumber"/>
+        <result column="build_param" property="buildParam"/>
+        <result column="result" property="result"/>
+        <result column="build_status" property="buildStatus"/>
+        <result column="trigger" property="trigger"/>
+        <result column="build_report" property="buildReport"/>
+        <result column="duration" property="duration"/>
+    </resultMap>
+
+
+</mapper>

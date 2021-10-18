@@ -32,7 +32,7 @@ public class CodeGenerator {
     /**
      * 需要生成的表名(两者只能取其一)
      */
-    private String[] includeTables = {"user"};
+    private String[] includeTables = {"tp_build"};
     /**
      * 需要排除的表名(两者只能取其一)
      */

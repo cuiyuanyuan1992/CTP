@@ -1,6 +1,13 @@
 package org.example.service.impl;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.example.dto.TpJobDTO;
 import org.example.service.BaseJob;
+import org.example.utils.JenkinsUtil;
+import org.springframework.util.ObjectUtils;
 
 public class ITJob implements BaseJob {
     private final String gitCredentialsId = "7eb52f73-3c6d-44e0-847d-8dc0c5e74cc5";
@@ -147,7 +154,52 @@ public class ITJob implements BaseJob {
             "</buildWrappers>\n" +
             "</project>";
     @Override
-    public String getJobXml() {
-        return null;
+    public String getJobXml(TpJobDTO jobDTO) {
+        Document document = this.setXml(jobDTO,itJobXml);
+        return document.asXML();
+    }
+
+    @Override
+    public String updateJobXml(TpJobDTO jobDTO) {
+        //获取任务配置的xml
+        JenkinsUtil jenkinsUtil = new JenkinsUtil();
+        String jobXml = jenkinsUtil.getJobConfig(jobDTO.getJobName());
+        Document document = this.setXml(jobDTO,jobXml);
+        return document.asXML();
+    }
+
+    private Document setXml(TpJobDTO jobDTO,String jobXml){
+        Document document = null;
+        try {
+            document = DocumentHelper.parseText(jobXml);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        //获取文档根节点
+        Element root = document.getRootElement();
+        if(!ObjectUtils.isEmpty(jobDTO.getDesc())){
+            Element description = root.element("description");
+            description.addText(jobDTO.getDesc());
+        }
+        if(!(ObjectUtils.isEmpty(jobDTO.getGitUrl()) || ObjectUtils.isEmpty(jobDTO.getGitBranch()))){
+            Element url = root.element("scm").element("userRemoteConfigs").element("hudson.plugins.git.UserRemoteConfig").element("url");
+            url.addText(jobDTO.getGitUrl());
+
+            Element branch = root.element("scm").element("branches").element("hudson.plugins.git.BranchSpec").element("name");
+            branch.addText(jobDTO.getGitBranch());
+        }
+        if(!ObjectUtils.isEmpty(jobDTO.getCommand())){
+            Element command = root.element("builders").element("hudson.tasks.Shell").element("command");
+            command.addText(jobDTO.getCommand());
+        }
+        if(!ObjectUtils.isEmpty(jobDTO.getRecipients())){
+            Element recipientList = root.element("publishers").element("hudson.plugins.emailext.ExtendedEmailPublisher").element("recipientList");
+            recipientList.addText(jobDTO.getRecipients());
+        }
+        if(!ObjectUtils.isEmpty(jobDTO.getTimeoutMinutes())){
+            Element timeoutMinutes = root.element("buildWrappers").element("hudson.plugins.build__timeout.BuildTimeoutWrapper").element("strategy").element("timeoutMinutes");
+            timeoutMinutes.addText(jobDTO.getTimeoutMinutes().toString());
+        }
+        return document;
     }
 }

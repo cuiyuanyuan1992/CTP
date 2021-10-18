@@ -15,7 +15,9 @@ import java.util.Map;
 @Slf4j
 public class JenkinsUtil {
     // 连接 Jenkins 需要设置的信息
-    static final String JENKINS_URL = "http://admin:1136825d669b60f83d2149a022670b98e0@10.10.47.84:8080/";
+    static final String JENKINS_USER = "admin:1136825d669b60f83d2149a022670b98e0";
+    static final String JENKINS_HOST = "192.168.31.142:8080";
+    static final String JENKINS_URL = "http://"+JENKINS_USER+"@"+JENKINS_HOST+"/";
     static final String JENKINS_USERNAME = "admin";
     static final String JENKINS_PASSWORD = "1136825d669b60f83d2149a022670b98e0";
 
@@ -47,13 +49,16 @@ public class JenkinsUtil {
      * @param jobName
      * @param jobXml
      */
-    public void ceateJob(String jobName,String jobXml){
+    public boolean ceateJob(String jobName,String jobXml){
         try {
             jenkins.createJob(jobName,jobXml);
             log.info("job={} create success",jobName);
+            return true;
         } catch (IOException e) {
+            log.error("job={} create failure",jobName);
             e.printStackTrace();
         }
+        return false;
     }
 
     /**
@@ -61,13 +66,16 @@ public class JenkinsUtil {
      * @param jobName
      * @param jobXml
      */
-    public void updateJob(String jobName,String jobXml){
+    public boolean updateJob(String jobName,String jobXml){
         try {
             jenkins.updateJob(jobName,jobXml);
             log.info("job={} update success",jobName);
+            return true;
         } catch (IOException e) {
+            log.error("job={} update failure",jobName);
             e.printStackTrace();
         }
+        return false;
     }
 
     /**
@@ -81,6 +89,7 @@ public class JenkinsUtil {
             log.info("job detail={}",job.toString());
             return job;
         } catch (IOException e) {
+            log.error("job={} get detail failure",jobName);
             e.printStackTrace();
         }
         return null;
@@ -111,6 +120,7 @@ public class JenkinsUtil {
             log.info("job xml={}",xml);
             return xml;
         } catch (IOException e) {
+            log.error("job={} get job xml failure",jobName);
             e.printStackTrace();
         }
         return null;
@@ -129,6 +139,7 @@ public class JenkinsUtil {
             log.info("job={} build success,build number={}",jobName,nextBuildNum);
             return nextBuildNum;
         }catch (Exception e){
+            log.error("job={} build failure",jobName);
             e.printStackTrace();
         }
         return null;
@@ -149,6 +160,7 @@ public class JenkinsUtil {
             log.info("job={} build success,build number={},param={}", jobName, nextBuildNum, param.toString());
             return nextBuildNum;
         } catch (IOException e) {
+            log.error("job={} build failure",jobName);
             e.printStackTrace();
         }
         return null;
@@ -169,6 +181,7 @@ public class JenkinsUtil {
             log.info("job={} stop result={}",jobName,result);
             return result;
         } catch (IOException e) {
+            log.error("job={} stop failure",jobName);
             e.printStackTrace();
         }
         return null;
@@ -183,6 +196,7 @@ public class JenkinsUtil {
             jenkins.deleteJob(jobName);
             log.info("job={} delete success",jobName);
         } catch (IOException e) {
+            log.error("job={} delete failure",jobName);
             e.printStackTrace();
         }
     }
@@ -196,6 +210,7 @@ public class JenkinsUtil {
             jenkins.disableJob(jobName);
             log.info("job={} disable success",jobName);
         } catch (IOException e) {
+            log.error("job={} disable failure",jobName);
             e.printStackTrace();
         }
     }
@@ -209,6 +224,7 @@ public class JenkinsUtil {
             jenkins.enableJob(jobName);
             log.info("job={} enable success",jobName);
         } catch (IOException e) {
+            log.error("job={} enable failure",jobName);
             e.printStackTrace();
         }
     }
@@ -227,6 +243,7 @@ public class JenkinsUtil {
             log.info("job={} last build info={}",jobName,lastBuild.details().toString());
             return lastBuild;
         } catch (IOException e) {
+            log.error("job={} get last build failure",jobName);
             e.printStackTrace();
         }
         return null;
@@ -247,6 +264,7 @@ public class JenkinsUtil {
             log.info("job={} number={} build info={}",jobName,buildNumber,numberBuild.details().toString());
             return numberBuild;
         } catch (IOException e) {
+            log.error("job={} buildNumber={} get detail failure",jobName,buildNumber);
             e.printStackTrace();
         }
         return null;
@@ -284,6 +302,7 @@ public class JenkinsUtil {
             log.info("build report url={}",reportUrl);
             return reportUrl;
         }catch (Exception e) {
+            log.error("job={} buildNumber={} get build report failure",jobName,buildNumber);
             e.printStackTrace();
         }
         return null;
