@@ -13,12 +13,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.common.Condition;
 import org.example.utils.BeanCopyUtils;
 import org.example.utils.JenkinsUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.AllArgsConstructor;
 import cn.hutool.core.util.StrUtil;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 

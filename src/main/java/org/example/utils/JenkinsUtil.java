@@ -6,6 +6,7 @@ import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.Job;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 @Slf4j
+@Component
 public class JenkinsUtil {
     // 连接 Jenkins 需要设置的信息
     static final String JENKINS_USER = "admin:1136825d669b60f83d2149a022670b98e0";
