@@ -87,7 +87,7 @@ public class R<T> implements Serializable {
 	 * @return R
 	 */
 	public static <T> R<T> data(String code, T data, String msg) {
-		return new R<T>(code, data, data == null ? Constant.DEFAULT_NULL_MESSAGE : msg);
+		return new R<T>(code, data, (data == null && msg == null)? Constant.DEFAULT_NULL_MESSAGE : msg);
 	}
 
 }

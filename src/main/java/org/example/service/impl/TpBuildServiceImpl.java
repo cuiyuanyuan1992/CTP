@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.entity.TpBuild;
 import org.example.mapper.TpBuildMapper;
 import org.example.service.ITpBuildService;
@@ -14,13 +15,14 @@ import cn.hutool.core.util.StrUtil;
 import java.util.List;
 
 /**
- *  服务实现类
+ *  构建记录服务实现类
  *
  * @author AI
  * @since 2021-10-18
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TpBuildServiceImpl implements ITpBuildService {
 
     protected TpBuildMapper tpBuildMapper;
@@ -69,18 +71,24 @@ public class TpBuildServiceImpl implements ITpBuildService {
 
     @Override
     public Integer save(TpBuildDTO dto) {
-        return tpBuildMapper.insert(BeanCopyUtils.copy(dto,TpBuild.class));
+        Integer result = tpBuildMapper.insert(BeanCopyUtils.copy(dto,TpBuild.class));
+        log.info("job={} number={} build start",dto.getJobName(),dto.getBuildNumber());
+        return result;
     }
 
     @Override
     public Integer updateById(TpBuildDTO dto) {
-        return tpBuildMapper.updateById(BeanCopyUtils.copy(dto,TpBuild.class));
+        Integer result = tpBuildMapper.updateById(BeanCopyUtils.copy(dto,TpBuild.class));
+        log.info("job={} number={} build update success",dto.getJobName(),dto.getBuildNumber());
+        return result;
     }
 
 
     @Override
     public Integer deleteLogic(List<Integer> toIntList) {
-        return tpBuildMapper.deleteBatchIds(toIntList);
+        Integer result = tpBuildMapper.deleteBatchIds(toIntList);
+        log.info("builds={} delete success",toIntList.toString());
+        return result;
     }
 
     @Override

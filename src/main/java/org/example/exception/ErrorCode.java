@@ -20,9 +20,14 @@ public enum ErrorCode {
     PARAM_IS_NULL("40002", "参数值为NULL或空字符串"),
 
     /**
-     * 用户金币不足
+     * 参数不唯一
      */
-    COINS_NOT_ENOUGH("40003", "用户金币不足"),
+    PARAM_NOT_UNIQUE("40003", "参数不唯一"),
+
+    /**
+     * 操作失败
+     */
+    OPERATION_FAILURE("40004", "操作失败"),
 
     /**
      * 请求头Authorization中的token为NULL或空字符串

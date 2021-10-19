@@ -9,6 +9,7 @@
         <result column="deleted" property="deleted"/>
         <result column="job_name" property="jobName"/>
         <result column="job_type" property="jobType"/>
+        <result column="job_status" property="jobStatus"/>
         <result column="git_url" property="gitUrl"/>
         <result column="git_branch" property="gitBranch"/>
         <result column="command" property="command"/>

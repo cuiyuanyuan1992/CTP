@@ -1,19 +1,25 @@
 package org.example.service.impl;
 
+import com.offbytwo.jenkins.model.BuildResult;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.TpBuildDTO;
 import org.example.entity.TpJob;
 import org.example.mapper.TpJobMapper;
 import org.example.service.BaseJob;
+import org.example.service.ITpBuildService;
 import org.example.service.ITpJobService;
 import org.example.dto.TpJobDTO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.common.Condition;
 import org.example.utils.BeanCopyUtils;
 import org.example.utils.JenkinsUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.AllArgsConstructor;
 import cn.hutool.core.util.StrUtil;
+import org.springframework.util.ObjectUtils;
+
 import java.util.List;
 
 /**
@@ -28,7 +34,8 @@ import java.util.List;
 public class TpJobServiceImpl implements ITpJobService {
 
     protected TpJobMapper tpJobMapper;
-    JenkinsUtil jenkinsUtil = new JenkinsUtil();
+    private ITpBuildService tpBuildService;
+    JenkinsUtil jenkinsUtil;
 
     @Override
     public IPage<TpJob> page(TpJobDTO dto) {
@@ -75,7 +82,6 @@ public class TpJobServiceImpl implements ITpJobService {
 
     @Override
     public Integer save(TpJobDTO dto) {
-        /// TODO: 2021/10/18 添加名称唯一性校验 
         JobFactory jobFactory = new JobFactory();
         BaseJob baseJob = jobFactory.getJob(dto.getJobType());
 
@@ -119,9 +125,22 @@ public class TpJobServiceImpl implements ITpJobService {
     }
 
     @Override
-    public Integer buildJob(String jobName) {
+    public Integer buildJob(String jobName,String trigger) {
         Integer buildNumber = jenkinsUtil.buildJob(jobName);
-        /// TODO: 2021/10/18 插入构建记录
+        //获取job信息
+        TpJobDTO dto = new TpJobDTO();
+        dto.setJobName(jobName);
+        TpJob job = this.getOne(dto);
+        //插入构建记录
+        TpBuildDTO buildDto = new TpBuildDTO();
+        buildDto.setJobId(job.getId());
+        buildDto.setJobName(jobName);
+        buildDto.setJobType(job.getJobType());
+        buildDto.setBuildNumber(buildNumber);
+        buildDto.setBuildParam(job.getBuildParam());
+        buildDto.setBuildStatus(BuildResult.BUILDING.name());
+        buildDto.setTrigger(trigger);
+        tpBuildService.save(buildDto);
         return buildNumber;
     }
 

@@ -25,7 +25,7 @@ public interface ITpJobService  {
 
         TpJob getOne(TpJobDTO dto) ;
 
-        public Integer buildJob(String jobName);
+        public Integer buildJob(String jobName,String trigger);
 
         public Integer disableJob(String jobName);
 
