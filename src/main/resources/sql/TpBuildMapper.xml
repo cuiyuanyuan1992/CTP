@@ -14,7 +14,7 @@
         <result column="build_param" property="buildParam"/>
         <result column="result" property="result"/>
         <result column="build_status" property="buildStatus"/>
-        <result column="trigger" property="trigger"/>
+        <result column="trigger_people" property="triggerPeople"/>
         <result column="build_report" property="buildReport"/>
         <result column="duration" property="duration"/>
     </resultMap>

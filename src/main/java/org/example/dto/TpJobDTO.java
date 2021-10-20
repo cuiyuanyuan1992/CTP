@@ -80,7 +80,7 @@ public class TpJobDTO extends CommonDto {
 		 * 任务描述
 		 */
 			@ApiModelProperty(value = "任务描述")
-					private String desc;
+					private String jobDesc;
 
 		/**
 		 * 任务状态

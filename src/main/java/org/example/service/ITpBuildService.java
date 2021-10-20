@@ -1,7 +1,10 @@
 package org.example.service;
 
+import com.offbytwo.jenkins.model.Build;
 import org.example.entity.TpBuild;
 import org.example.dto.TpBuildDTO;
+
+import java.io.IOException;
 import java.util.List;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
@@ -24,4 +27,10 @@ public interface ITpBuildService  {
         Integer deleteLogic(List<Integer> toIntList) ;
 
         TpBuild getOne(TpBuildDTO dto) ;
+
+        Integer stopJob(String jobName)throws IOException;
+
+        String getJobBuildLog(String jobName,int buildNumber);
+
+        String getBuildResult(Build build) throws IOException;
 }

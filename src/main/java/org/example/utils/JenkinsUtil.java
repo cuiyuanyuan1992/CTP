@@ -18,7 +18,7 @@ import java.util.Map;
 public class JenkinsUtil {
     // 连接 Jenkins 需要设置的信息
     static final String JENKINS_USER = "admin:1136825d669b60f83d2149a022670b98e0";
-    static final String JENKINS_HOST = "192.168.0.144:8080";
+    static final String JENKINS_HOST = "192.168.31.142:8080";
     static final String JENKINS_URL = "http://"+JENKINS_USER+"@"+JENKINS_HOST+"/";
     static final String JENKINS_USERNAME = "admin";
     static final String JENKINS_PASSWORD = "1136825d669b60f83d2149a022670b98e0";

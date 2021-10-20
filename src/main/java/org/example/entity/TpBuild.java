@@ -64,7 +64,7 @@ public class TpBuild extends BaseEntity {
      * 构建人
      */
   @ApiModelProperty(value = "构建人")
-  private String trigger;
+  private String triggerPeople;
     /**
      * 构建报告
      */
@@ -74,7 +74,7 @@ public class TpBuild extends BaseEntity {
      * 耗时
      */
   @ApiModelProperty(value = "耗时")
-  private Integer duration;
+  private Double duration;
 
 
 }

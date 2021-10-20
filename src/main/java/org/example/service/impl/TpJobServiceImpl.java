@@ -119,7 +119,8 @@ public class TpJobServiceImpl implements ITpJobService {
 
     @Override
     public TpJob getOne(TpJobDTO dto) {
-        return tpJobMapper.selectOne(Condition.getQueryWrapper(BeanCopyUtils.copy(dto,TpJob.class)));
+        TpJob job = tpJobMapper.selectOne(Condition.getQueryWrapper(BeanCopyUtils.copy(dto,TpJob.class)));
+        return job;
     }
 
     @Override
@@ -137,7 +138,7 @@ public class TpJobServiceImpl implements ITpJobService {
         buildDto.setBuildNumber(buildNumber);
         buildDto.setBuildParam(job.getBuildParam());
         buildDto.setBuildStatus(BuildResult.BUILDING.name());
-        buildDto.setTrigger(trigger);
+        buildDto.setTriggerPeople(trigger);
         tpBuildService.save(buildDto);
         return buildNumber;
     }

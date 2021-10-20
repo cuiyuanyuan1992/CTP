@@ -60,7 +60,7 @@ public class TpBuildDTO extends CommonDto {
 		 * 构建人
 		 */
 			@ApiModelProperty(value = "构建人")
-					private String trigger;
+					private String triggerPeople;
 		/**
 		 * 构建报告
 		 */
@@ -70,7 +70,7 @@ public class TpBuildDTO extends CommonDto {
 		 * 耗时
 		 */
 			@ApiModelProperty(value = "耗时")
-					private Integer duration;
+					private Double duration;
 
 			@ApiModelProperty(value = "是否删除")
 			private Integer deleted;

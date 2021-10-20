@@ -106,4 +106,34 @@ public class TpJobController {
 		}
 		return R.data(result);
 	}
+
+	@PostMapping("/disable")
+	@ApiOperation(value = "禁用job", notes = "传入任务名称")
+	public R disable(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName) {
+		Integer result = tpJobService.disableJob(jobName);
+		if(ObjectUtils.isEmpty(result) || result.intValue()<=0){
+			return R.data(ErrorCode.OPERATION_FAILURE.getErrorCode(),null,ErrorCode.OPERATION_FAILURE.getErrorMessage());
+		}
+		return R.data(result);
+	}
+
+	@PostMapping("/enable")
+	@ApiOperation(value = "启用job", notes = "传入任务名称")
+	public R enable(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName) {
+		Integer result = tpJobService.enableJob(jobName);
+		if(ObjectUtils.isEmpty(result) || result.intValue()<=0){
+			return R.data(ErrorCode.OPERATION_FAILURE.getErrorCode(),null,ErrorCode.OPERATION_FAILURE.getErrorMessage());
+		}
+		return R.data(result);
+	}
+
+	@PostMapping("/build")
+	@ApiOperation(value = "构建job", notes = "传入任务名称,触发人")
+	public R build(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName,@ApiParam(value = "触发人", required = true) @RequestParam String trigger) {
+		Integer result = tpJobService.buildJob(jobName,trigger);
+		if(ObjectUtils.isEmpty(result) || result.intValue()<=0){
+			return R.data(ErrorCode.OPERATION_FAILURE.getErrorCode(),null,ErrorCode.OPERATION_FAILURE.getErrorMessage());
+		}
+		return R.data(result);
+	}
 }

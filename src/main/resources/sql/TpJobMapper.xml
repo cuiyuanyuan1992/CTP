@@ -19,7 +19,7 @@
         <result column="timer" property="timer"/>
         <result column="creator" property="creator"/>
         <result column="updator" property="updator"/>
-        <result column="desc" property="desc"/>
+        <result column="job_desc" property="jobDesc"/>
     </resultMap>
 
 

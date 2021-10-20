@@ -51,7 +51,7 @@ public class ITJob implements BaseJob {
             " </body>\n" +
             "</html>";
 
-    private String itJobXml = "<project>\n" +
+    private String itJobXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+"<project>\n" +
             "<actions/>\n" +
             "<description/>\n" +
             "<keepDependencies>false</keepDependencies>\n" +
@@ -130,7 +130,7 @@ public class ITJob implements BaseJob {
             "</configuredTriggers>\n" +
             "<contentType>text/html</contentType>\n" +
             "<defaultSubject>$DEFAULT_SUBJECT</defaultSubject>\n" +
-            "<defaultContent>"+mailHtml+"</defaultContent>\n" +
+            "<defaultContent></defaultContent>\n" +
             "<attachmentsPattern/>\n" +
             "<presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>\n" +
             "<postsendScript>$DEFAULT_POSTSEND_SCRIPT</postsendScript>\n" +
@@ -177,28 +177,32 @@ public class ITJob implements BaseJob {
         }
         //获取文档根节点
         Element root = document.getRootElement();
-        if(!ObjectUtils.isEmpty(jobDTO.getDesc())){
+        if(!ObjectUtils.isEmpty(jobDTO.getJobDesc())){
             Element description = root.element("description");
-            description.addText(jobDTO.getDesc());
+            description.setText(jobDTO.getJobDesc());
         }
         if(!(ObjectUtils.isEmpty(jobDTO.getGitUrl()) || ObjectUtils.isEmpty(jobDTO.getGitBranch()))){
             Element url = root.element("scm").element("userRemoteConfigs").element("hudson.plugins.git.UserRemoteConfig").element("url");
-            url.addText(jobDTO.getGitUrl());
+            url.setText(jobDTO.getGitUrl());
 
             Element branch = root.element("scm").element("branches").element("hudson.plugins.git.BranchSpec").element("name");
-            branch.addText(jobDTO.getGitBranch());
+            branch.setText(jobDTO.getGitBranch());
         }
         if(!ObjectUtils.isEmpty(jobDTO.getCommand())){
             Element command = root.element("builders").element("hudson.tasks.Shell").element("command");
-            command.addText(jobDTO.getCommand());
+            command.setText(jobDTO.getCommand());
         }
         if(!ObjectUtils.isEmpty(jobDTO.getRecipients())){
             Element recipientList = root.element("publishers").element("hudson.plugins.emailext.ExtendedEmailPublisher").element("recipientList");
-            recipientList.addText(jobDTO.getRecipients());
+            recipientList.setText(jobDTO.getRecipients());
         }
         if(!ObjectUtils.isEmpty(jobDTO.getTimeoutMinutes())){
             Element timeoutMinutes = root.element("buildWrappers").element("hudson.plugins.build__timeout.BuildTimeoutWrapper").element("strategy").element("timeoutMinutes");
-            timeoutMinutes.addText(jobDTO.getTimeoutMinutes().toString());
+            timeoutMinutes.setText(jobDTO.getTimeoutMinutes().toString());
+        }
+        Element defaultContent = root.element("publishers").element("hudson.plugins.emailext.ExtendedEmailPublisher").element("defaultContent");
+        if(ObjectUtils.isEmpty(defaultContent.getText())){
+            defaultContent.setText(mailHtml);
         }
         return document;
     }

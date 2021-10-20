@@ -4,8 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.common.R;
+import org.example.exception.ErrorCode;
 import org.example.utils.Func;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.List;
@@ -21,6 +24,7 @@ import org.example.service.ITpBuildService;
  * @since 2021-10-18
  */
 @RestController
+@Slf4j
 @AllArgsConstructor
 @RequestMapping("tpBuild")
 @Api(description = "相关接口")
@@ -58,30 +62,47 @@ public class TpBuildController {
 	}
 
 	/**
-	 * 新增 
-	 */
-	@PostMapping("/save")
-	@ApiOperation(value = "新增", notes = "传入tpBuild")
-	public R save(@RequestBody TpBuildDTO dto) {
-		return R.data(tpBuildService.save(dto));
-	}
-
-	/**
-	 * 修改 
-	 */
-	@PutMapping("/update")
-	@ApiOperation(value = "修改", notes = "传入tpBuild")
-	public R update(@RequestBody TpBuildDTO dto) {
-		return R.data(tpBuildService.updateById(dto));
-	}
-
-	/**
 	 * 删除 
 	 */
 	@DeleteMapping("/remove")
 	@ApiOperation(value = "逻辑删除", notes = "传入ids")
 	public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
-		return R.data(tpBuildService.deleteLogic(Func.toIntList(ids)));
+		Integer result = tpBuildService.deleteLogic(Func.toIntList(ids));
+		if(ObjectUtils.isEmpty(result) || result.intValue()<=0){
+			return R.data(ErrorCode.OPERATION_FAILURE.getErrorCode(),null,ErrorCode.OPERATION_FAILURE.getErrorMessage());
+		}
+		return R.data(result);
 	}
 
+	/**
+	 * 停止任务
+	 */
+	@PostMapping("/stop")
+	@ApiOperation(value = "停止job", notes = "传入任务名称")
+	public R disable(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName) {
+		Integer result = 0;
+		try{
+			result = tpBuildService.stopJob(jobName);
+			if(ObjectUtils.isEmpty(result) || result.intValue()<=0){
+				return R.data(ErrorCode.OPERATION_FAILURE.getErrorCode(),null,ErrorCode.OPERATION_FAILURE.getErrorMessage());
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			return R.data(ErrorCode.OPERATION_FAILURE.getErrorCode(),null,e.getMessage());
+		}
+		return R.data(result);
+	}
+
+	/**
+	 * 获取日志
+	 */
+	@PostMapping("/getlog")
+	@ApiOperation(value = "获取构建日志", notes = "获取构建日志")
+	public R getLog(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName,@ApiParam(value = "构建编号", required = true) @RequestParam int buildNumber) {
+		String log = tpBuildService.getJobBuildLog(jobName, buildNumber);
+		if (ObjectUtils.isEmpty(log)) {
+			return R.data(ErrorCode.OPERATION_FAILURE.getErrorCode(), null, ErrorCode.OPERATION_FAILURE.getErrorMessage());
+		}
+		return R.data(log);
+	}
 }

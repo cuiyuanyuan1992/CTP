@@ -62,7 +62,7 @@ public class R<T> implements Serializable {
 	 * @return R
 	 */
 	public static <T> R<T> data(T data) {
-		return data(data, Constant.DEFAULT_SUCCESS_MESSAGE);
+		return data(data, data == null ? Constant.DEFAULT_NULL_MESSAGE : Constant.DEFAULT_SUCCESS_MESSAGE);
 	}
 
 	/**
