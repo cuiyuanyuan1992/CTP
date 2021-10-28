@@ -1,15 +1,26 @@
 package org.example.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.BuildWithDetails;
+import com.offbytwo.jenkins.model.TestReport;
+import com.offbytwo.jenkins.model.TestResult;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.example.dto.ResultDto;
 import org.example.dto.TpJobDTO;
 import org.example.service.BaseJob;
 import org.example.utils.JenkinsUtil;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+
 public class ITJob implements BaseJob {
+    JenkinsUtil jenkinsUtil = new JenkinsUtil();
     private final String gitCredentialsId = "7eb52f73-3c6d-44e0-847d-8dc0c5e74cc5";
     private final String mailHtml = "<!DOCTYPE html>\n" +
             "<html>\n" +
@@ -166,6 +177,41 @@ public class ITJob implements BaseJob {
         String jobXml = jenkinsUtil.getJobConfig(jobDTO.getJobName());
         Document document = this.setXml(jobDTO,jobXml);
         return document.asXML();
+    }
+
+    @Override
+    public String getBuildResult(String jobName,String buildNumber) {
+        ResultDto resultDto = new ResultDto();
+        String resultXml = jenkinsUtil.getBuildResult(jobName,buildNumber);
+
+        Document document = null;
+        try {
+            document = DocumentHelper.parseText(resultXml);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        //获取文档根节点
+        Element root = document.getRootElement();
+        List<Element> elementList = root.elements();
+        Element testngAction = null;
+        for(Element e : elementList){
+            if(e.attribute("_class")!=null && e.attribute("_class").getValue().equals("hudson.plugins.testng.TestNGTestResultBuildAction")){
+                testngAction = e;
+            }
+        }
+        int failCount = Integer.parseInt(testngAction.element("failCount").getText());
+        int skipCount = Integer.parseInt(testngAction.element("skipCount").getText());
+        int total = Integer.parseInt(testngAction.element("totalCount").getText());
+        int passCount = total - failCount - skipCount;
+
+        float successRate = new BigDecimal(passCount).divide(new BigDecimal(total),2, BigDecimal.ROUND_HALF_UP).floatValue();
+
+        resultDto.setFailCount(failCount);
+        resultDto.setPassCount(passCount);
+        resultDto.setSkipCount(skipCount);
+        resultDto.setSuccessRate(successRate);
+        return JSON.toJSONString(resultDto);
+
     }
 
     private Document setXml(TpJobDTO jobDTO,String jobXml){

@@ -32,5 +32,5 @@ public interface ITpBuildService  {
 
         String getJobBuildLog(String jobName,int buildNumber);
 
-        String getBuildResult(Build build) throws IOException;
+        String getBuildResult(Build build,String jobName,String jobType) throws IOException;
 }

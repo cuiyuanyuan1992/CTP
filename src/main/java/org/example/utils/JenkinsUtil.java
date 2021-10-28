@@ -6,35 +6,42 @@ import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.Job;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import lombok.extern.slf4j.Slf4j;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Component
 public class JenkinsUtil {
     // 连接 Jenkins 需要设置的信息
-    static final String JENKINS_USER = "admin:1136825d669b60f83d2149a022670b98e0";
     static final String JENKINS_HOST = "192.168.31.142:8080";
-    static final String JENKINS_URL = "http://"+JENKINS_USER+"@"+JENKINS_HOST+"/";
     static final String JENKINS_USERNAME = "admin";
     static final String JENKINS_PASSWORD = "1136825d669b60f83d2149a022670b98e0";
+    static final String JENKINS_USER = JENKINS_USERNAME+":"+JENKINS_PASSWORD;
+    static final String JENKINS_URL = "http://"+JENKINS_USER+"@"+JENKINS_HOST+"/";
 
-//    HttpUtils httpUtils = new HttpUtils();
+    HttpUtils httpUtils = new HttpUtils();
 //    public static String jenkinsUrl = "http://192.168.31.142:8080/";
-//
-//    public void buildJob(String jobName){
-//        String url = jenkinsUrl+"job/"+jobName+"/build";
-//        httpUtils.doPost(url,null,"admin","1136825d669b60f83d2149a022670b98e0");
-//    }
-//
-//    public static void main(String[] args) {
-//        JenkinsUtil jenkinsUtil = new JenkinsUtil();
-//        jenkinsUtil.buildJob("test");
-//    }
+
+    /**
+     * 获取构建xml结果
+     * @param jobName
+     * @param buildNumber
+     * @return
+     */
+    public String getBuildResult(String jobName,String buildNumber){
+        String url = JENKINS_URL+"job/"+jobName+"/"+buildNumber+"/api/xml";
+        String result = httpUtils.doPost(url,null,JENKINS_USERNAME,JENKINS_PASSWORD);
+        return result;
+    }
 
     private static JenkinsServer jenkins ;
 
@@ -309,4 +316,26 @@ public class JenkinsUtil {
         }
         return null;
     }
+
+
+//    public static void main(String[] args) {
+//        JenkinsUtil jenkinsUtil = new JenkinsUtil();
+//        String resultXml = jenkinsUtil.getBuildResult("test","13");
+//
+//        Document document = null;
+//        try {
+//            document = DocumentHelper.parseText(resultXml);
+//        } catch (DocumentException e) {
+//            e.printStackTrace();
+//        }
+//        //获取文档根节点
+//        Element root = document.getRootElement();
+//        List<Element> elementList = root.elements();
+//        for(Element e : elementList){
+//            if(e.attribute("_class")!=null && e.attribute("_class").getValue().equals("hudson.plugins.testng.TestNGTestResultBuildAction")){
+//                int fail = Integer.parseInt(e.element("failCount").getText());
+//                System.out.println(fail);
+//            }
+//        }
+//    }
 }

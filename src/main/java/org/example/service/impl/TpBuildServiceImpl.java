@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.dto.ResultDto;
 import org.example.entity.TpBuild;
 import org.example.mapper.TpBuildMapper;
+import org.example.service.BaseJob;
 import org.example.service.ITpBuildService;
 import org.example.dto.TpBuildDTO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -117,13 +118,13 @@ public class TpBuildServiceImpl implements ITpBuildService {
         dto.setBuildNumber(jenkinsBuild.getNumber());
         TpBuild build = this.getOne(dto);
 
-        String result = this.getBuildResult(jenkinsBuild);
+        String result = this.getBuildResult(jenkinsBuild,jobName,build.getJobType());
         if(!ObjectUtils.isEmpty(result)){
             //构建结果对象
             build.setResult(result);
-            build.setBuildReport(jenkinsUtil.getJobBuildReport(jobName,jenkinsBuild.getNumber()));
-            build.setDuration(jenkinsBuild.details().getTestResult().getDuration());
         }
+        build.setBuildReport(jenkinsUtil.getJobBuildReport(jobName,jenkinsBuild.getNumber()));
+        build.setDuration(Double.valueOf(String.valueOf(jenkinsBuild.details().getDuration())));
         build.setBuildStatus(jenkinsBuild.details().getResult().name());
 
         Integer update = this.updateById(BeanCopyUtils.copy(build,TpBuildDTO.class));
@@ -136,25 +137,10 @@ public class TpBuildServiceImpl implements ITpBuildService {
     }
 
     @Override
-    public String getBuildResult(Build build){
-        ResultDto resultDto = new ResultDto();
-        TestResult testResult = null;
-        try {
-            testResult = build.details().getTestResult();
-            int failCount = testResult.getFailCount();
-            int passCount = testResult.getPassCount();
-            int skipCount = testResult.getSkipCount();
-            int total = failCount + passCount + skipCount;
-            float successRate = new BigDecimal(passCount).divide(new BigDecimal(total),2, BigDecimal.ROUND_HALF_UP).floatValue();
-
-            resultDto.setFailCount(failCount);
-            resultDto.setPassCount(passCount);
-            resultDto.setSkipCount(skipCount);
-            resultDto.setSuccessRate(successRate);
-            return JSON.toJSONString(resultDto);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public String getBuildResult(Build build,String jobName,String jobType) throws IOException {
+        JobFactory jobFactory = new JobFactory();
+        BaseJob baseJob = jobFactory.getJob(jobType);
+        String result = baseJob.getBuildResult(jobName,String.valueOf(build.getNumber()));
+        return result;
     }
 }

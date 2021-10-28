@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import com.offbytwo.jenkins.model.BuildResult;
 import lombok.extern.slf4j.Slf4j;
+import org.example.job.JenkinsJob;
 import org.example.dto.TpBuildDTO;
 import org.example.entity.TpJob;
 import org.example.mapper.TpJobMapper;
@@ -13,10 +14,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.common.Condition;
 import org.example.utils.BeanCopyUtils;
 import org.example.utils.JenkinsUtil;
+import org.example.utils.QuartzManager;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.AllArgsConstructor;
 import cn.hutool.core.util.StrUtil;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -85,6 +88,11 @@ public class TpJobServiceImpl implements ITpJobService {
 
         boolean result = jenkinsUtil.ceateJob(dto.getJobName(),baseJob.getJobXml(dto));
 
+        //设置定时器
+        if(!ObjectUtils.isEmpty(dto.getTimer())){
+            QuartzManager.addJob(dto.getJobName(), JenkinsJob.class,dto.getTimer());
+        }
+
         if(result){
             log.info("job={} create success!",dto.getJobName());
             return tpJobMapper.insert(BeanCopyUtils.copy(dto,TpJob.class));
@@ -98,6 +106,13 @@ public class TpJobServiceImpl implements ITpJobService {
         BaseJob baseJob = jobFactory.getJob(dto.getJobType());
 
         boolean result = jenkinsUtil.updateJob(dto.getJobName(),baseJob.updateJobXml(dto));
+
+        //设置定时器
+        QuartzManager.removeJob(dto.getJobName());
+        if(!ObjectUtils.isEmpty(dto.getTimer())){
+            QuartzManager.addJob(dto.getJobName(), JenkinsJob.class,dto.getTimer());
+        }
+
         if(result){
             log.info("job={} update success!",dto.getJobName());
             return tpJobMapper.updateById(BeanCopyUtils.copy(dto,TpJob.class));
@@ -110,9 +125,14 @@ public class TpJobServiceImpl implements ITpJobService {
     public Integer deleteLogic(Integer id) {
         TpJobDTO dto = new TpJobDTO();
         dto.setId(id);
-        String jobName = this.getOne(dto).getJobName();
-        jenkinsUtil.deleteJob(jobName);
-        log.info("job={} delete success!",jobName);
+        TpJob job = this.getOne(dto);
+        jenkinsUtil.deleteJob(job.getJobName());
+        log.info("job={} delete success!",job.getJobName());
+
+        //删除定时器
+        if(!ObjectUtils.isEmpty(job.getTimer())){
+            QuartzManager.removeJob(dto.getJobName());
+        }
 
         return tpJobMapper.deleteById(id);
     }
@@ -152,6 +172,11 @@ public class TpJobServiceImpl implements ITpJobService {
         dto.setJobName(jobName);
         TpJob job = this.getOne(dto);
 
+        //删除定时器
+        if(!ObjectUtils.isEmpty(job.getTimer())){
+            QuartzManager.removeJob(dto.getJobName());
+        }
+
         job.setJobStatus("disable");
         return tpJobMapper.updateById(BeanCopyUtils.copy(job,TpJob.class));
     }
@@ -164,6 +189,11 @@ public class TpJobServiceImpl implements ITpJobService {
         TpJobDTO dto = new TpJobDTO();
         dto.setJobName(jobName);
         TpJob job = this.getOne(dto);
+
+        //添加定时器
+        if(!ObjectUtils.isEmpty(job.getTimer())){
+            QuartzManager.addJob(dto.getJobName(), JenkinsJob.class,dto.getTimer());
+        }
 
         job.setJobStatus("enable");
         return tpJobMapper.updateById(BeanCopyUtils.copy(job,TpJob.class));
