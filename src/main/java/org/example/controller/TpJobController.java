@@ -34,9 +34,9 @@ public class TpJobController {
 	/**
 	 * 详情
 	 */
-	@GetMapping("/detail")
+	@PostMapping("/detail")
 	@ApiOperation(value = "详情", notes = "传入tpJob")
-	public R<TpJob> detail(TpJobDTO dto) {
+	public R<TpJob> detail(@RequestBody TpJobDTO dto) {
 		TpJob detail = tpJobService.getOne(dto);
 		return R.data(detail);
 	}
@@ -44,18 +44,18 @@ public class TpJobController {
 	/**
 	 * 分页 
 	 */
-	@GetMapping("/page")
+	@PostMapping("/page")
 	@ApiOperation(value = "分页", notes = "传入tpJob")
-	public R<IPage<TpJob>> page(TpJobDTO dto) {
+	public R<IPage<TpJob>> page(@RequestBody TpJobDTO dto) {
 		IPage<TpJob> pages = tpJobService.page(dto);
 		return R.data(pages);
 	}
 	/**
 	 * 不分页 
 	 */
-	@GetMapping("/list")
+	@PostMapping("/list")
 	@ApiOperation(value = "不分页", notes = "传入tpJob")
-	public R<List<TpJob>> list(TpJobDTO dto) {
+	public R<List<TpJob>> list(@RequestBody TpJobDTO dto) {
 		List<TpJob> list = tpJobService.list(dto);
 		return R.data(list);
 	}
@@ -107,7 +107,7 @@ public class TpJobController {
 		return R.data(result);
 	}
 
-	@PostMapping("/disable")
+	@GetMapping("/disable")
 	@ApiOperation(value = "禁用job", notes = "传入任务名称")
 	public R disable(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName) {
 		Integer result = tpJobService.disableJob(jobName);
@@ -117,7 +117,7 @@ public class TpJobController {
 		return R.data(result);
 	}
 
-	@PostMapping("/enable")
+	@GetMapping("/enable")
 	@ApiOperation(value = "启用job", notes = "传入任务名称")
 	public R enable(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName) {
 		Integer result = tpJobService.enableJob(jobName);
@@ -127,7 +127,7 @@ public class TpJobController {
 		return R.data(result);
 	}
 
-	@PostMapping("/build")
+	@GetMapping("/build")
 	@ApiOperation(value = "构建job", notes = "传入任务名称,触发人")
 	public R build(@ApiParam(value = "任务名称", required = true) @RequestParam String jobName,@ApiParam(value = "触发人", required = true) @RequestParam String trigger) {
 		Integer result = tpJobService.buildJob(jobName,trigger);

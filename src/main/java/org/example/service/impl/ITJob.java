@@ -1,10 +1,6 @@
 package org.example.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.offbytwo.jenkins.model.Build;
-import com.offbytwo.jenkins.model.BuildWithDetails;
-import com.offbytwo.jenkins.model.TestReport;
-import com.offbytwo.jenkins.model.TestResult;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -15,7 +11,6 @@ import org.example.service.BaseJob;
 import org.example.utils.JenkinsUtil;
 import org.springframework.util.ObjectUtils;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -120,6 +115,18 @@ public class ITJob implements BaseJob {
             "<disabled>false</disabled>\n" +
             "<report>allure-report</report>\n" +
             "</ru.yandex.qatools.allure.jenkins.AllureReportPublisher>\n" +
+            "<hudson.plugins.testng.Publisher plugin=\"testng-plugin@1.15\">\n" +
+            "<reportFilenamePattern>**/testng-results.xml</reportFilenamePattern>\n" +
+            "<escapeTestDescp>true</escapeTestDescp>\n" +
+            "<escapeExceptionMsg>true</escapeExceptionMsg>\n" +
+            "<failureOnFailedTestConfig>false</failureOnFailedTestConfig>\n" +
+            "<showFailedBuilds>false</showFailedBuilds>\n" +
+            "<unstableSkips>100</unstableSkips>\n" +
+            "<unstableFails>0</unstableFails>\n" +
+            "<failedSkips>100</failedSkips>\n" +
+            "<failedFails>100</failedFails>\n" +
+            "<thresholdMode>2</thresholdMode>\n" +
+            "</hudson.plugins.testng.Publisher>"+
             "<hudson.plugins.emailext.ExtendedEmailPublisher plugin=\"email-ext@2.83\">\n" +
             "<recipientList></recipientList>\n" +
             "<configuredTriggers>\n" +
@@ -199,19 +206,20 @@ public class ITJob implements BaseJob {
                 testngAction = e;
             }
         }
-        int failCount = Integer.parseInt(testngAction.element("failCount").getText());
-        int skipCount = Integer.parseInt(testngAction.element("skipCount").getText());
-        int total = Integer.parseInt(testngAction.element("totalCount").getText());
-        int passCount = total - failCount - skipCount;
+        if(!ObjectUtils.isEmpty(testngAction)){
+            int failCount = Integer.parseInt(testngAction.element("failCount").getText());
+            int skipCount = Integer.parseInt(testngAction.element("skipCount").getText());
+            int total = Integer.parseInt(testngAction.element("totalCount").getText());
+            int passCount = total - failCount - skipCount;
 
-        float successRate = new BigDecimal(passCount).divide(new BigDecimal(total),2, BigDecimal.ROUND_HALF_UP).floatValue();
+            float successRate = new BigDecimal(passCount).divide(new BigDecimal(total),2, BigDecimal.ROUND_HALF_UP).floatValue();
 
-        resultDto.setFailCount(failCount);
-        resultDto.setPassCount(passCount);
-        resultDto.setSkipCount(skipCount);
-        resultDto.setSuccessRate(successRate);
+            resultDto.setFailCount(failCount);
+            resultDto.setPassCount(passCount);
+            resultDto.setSkipCount(skipCount);
+            resultDto.setSuccessRate(successRate);
+        }
         return JSON.toJSONString(resultDto);
-
     }
 
     private Document setXml(TpJobDTO jobDTO,String jobXml){
