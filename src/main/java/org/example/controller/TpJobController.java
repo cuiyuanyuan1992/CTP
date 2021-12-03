@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.common.R;
 import org.example.exception.ErrorCode;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.List;
@@ -47,6 +48,21 @@ public class TpJobController {
 	@PostMapping("/page")
 	@ApiOperation(value = "分页", notes = "传入tpJob")
 	public R<IPage<TpJob>> page(@RequestBody TpJobDTO dto) {
+		if(StringUtils.isEmpty(dto.getJobName())){
+			dto.setJobName(null);
+		}else{
+			dto.setColumn("job_name");
+			dto.setKeywords(dto.getJobName());
+			dto.setJobName(null);
+		}
+		if(StringUtils.isEmpty(dto.getCreator())){
+			dto.setCreator(null);
+		}else{
+			dto.setColumn("creator");
+			dto.setKeywords(dto.getCreator());
+			dto.setCreator(null);
+		}
+		dto.setOrderDesc("id");
 		IPage<TpJob> pages = tpJobService.page(dto);
 		return R.data(pages);
 	}

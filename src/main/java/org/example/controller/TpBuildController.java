@@ -9,6 +9,7 @@ import org.example.common.R;
 import org.example.exception.ErrorCode;
 import org.example.utils.Func;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.List;
@@ -35,9 +36,9 @@ public class TpBuildController {
 	/**
 	 * 详情
 	 */
-	@GetMapping("/detail")
+	@PostMapping("/detail")
 	@ApiOperation(value = "详情", notes = "传入tpBuild")
-	public R<TpBuild> detail(TpBuildDTO dto) {
+	public R<TpBuild> detail(@RequestBody TpBuildDTO dto) {
 		TpBuild detail = tpBuildService.getOne(dto);
 		return R.data(detail);
 	}
@@ -45,18 +46,33 @@ public class TpBuildController {
 	/**
 	 * 分页 
 	 */
-	@GetMapping("/page")
+	@PostMapping("/page")
 	@ApiOperation(value = "分页", notes = "传入tpBuild")
-	public R<IPage<TpBuild>> page(TpBuildDTO dto) {
+	public R<IPage<TpBuild>> page(@RequestBody TpBuildDTO dto) {
+		if(StringUtils.isEmpty(dto.getJobName())){
+			dto.setJobName(null);
+		}else{
+			dto.setColumn("job_name");
+			dto.setKeywords(dto.getJobName());
+			dto.setJobName(null);
+		}
+		if(StringUtils.isEmpty(dto.getTriggerPeople())){
+			dto.setTriggerPeople(null);
+		}else{
+			dto.setColumn("trigger_people");
+			dto.setKeywords(dto.getTriggerPeople());
+			dto.setTriggerPeople(null);
+		}
+		dto.setOrderDesc("id");
 		IPage<TpBuild> pages = tpBuildService.page(dto);
 		return R.data(pages);
 	}
 	/**
 	 * 不分页 
 	 */
-	@GetMapping("/list")
+	@PostMapping("/list")
 	@ApiOperation(value = "不分页", notes = "传入tpBuild")
-	public R<List<TpBuild>> list(TpBuildDTO dto) {
+	public R<List<TpBuild>> list(@RequestBody TpBuildDTO dto) {
 		List<TpBuild> list = tpBuildService.list(dto);
 		return R.data(list);
 	}

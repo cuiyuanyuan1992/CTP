@@ -11,6 +11,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Component
 public class JenkinsUtil {
     // 连接 Jenkins 需要设置的信息
-    static final String JENKINS_HOST = "192.168.31.142:8080";
+    static final String JENKINS_HOST = "172.16.215.151:8080";
     static final String JENKINS_USERNAME = "admin";
     static final String JENKINS_PASSWORD = "1136825d669b60f83d2149a022670b98e0";
     static final String JENKINS_USER = JENKINS_USERNAME+":"+JENKINS_PASSWORD;
@@ -270,9 +271,9 @@ public class JenkinsUtil {
             JobWithDetails job = jenkins.getJob(jobName);
             // 根据
             Build numberBuild = job.getBuildByNumber(buildNumber);
-            log.info("job={} number={} build info={}",jobName,buildNumber,numberBuild.details().toString());
+            log.info("job={} number={} build info={}",jobName,buildNumber,numberBuild.toString());
             return numberBuild;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("job={} buildNumber={} get detail failure",jobName,buildNumber);
             e.printStackTrace();
         }
@@ -287,11 +288,13 @@ public class JenkinsUtil {
      */
     public String getJobBuildLog(String jobName,int buildNumber){
         try {
-            BuildWithDetails build = this.getJobByNumber(jobName,buildNumber).details();
+            Build build = this.getJobByNumber(jobName,buildNumber);
+            if(!ObjectUtils.isEmpty(build)){
+                BuildWithDetails buildDetail = build.details();
+//                return buildDetail.getConsoleOutputText();
+                return buildDetail.getConsoleOutputHtml();
+            }
             // 获取构建的日志，如果正在执行构建，则会只获取已经执行的过程日志
-            return build.getConsoleOutputText();
-//            // Html格式日志
-//            System.out.println(build.getConsoleOutputHtml());
         }catch (IOException e) {
             e.printStackTrace();
         }
