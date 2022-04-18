@@ -6,31 +6,24 @@ import com.offbytwo.jenkins.model.BuildWithDetails;
 import com.offbytwo.jenkins.model.Job;
 import com.offbytwo.jenkins.model.JobWithDetails;
 import lombok.extern.slf4j.Slf4j;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
+import org.example.config.JenkinsConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Component
 public class JenkinsUtil {
+
     // 连接 Jenkins 需要设置的信息
-    static final String JENKINS_HOST = "172.16.215.151:8080";
-    static final String JENKINS_USERNAME = "admin";
-    static final String JENKINS_PASSWORD = "1136825d669b60f83d2149a022670b98e0";
-    static final String JENKINS_USER = JENKINS_USERNAME+":"+JENKINS_PASSWORD;
-    static final String JENKINS_URL = "http://"+JENKINS_USER+"@"+JENKINS_HOST+"/";
+    static String JENKINS_USER = JenkinsConfig.JENKINS_USERNAME+":"+JenkinsConfig.JENKINS_PASSWORD;
+    static String JENKINS_URL = "http://"+JENKINS_USER+"@"+JenkinsConfig.JENKINS_HOST+"/";
 
     HttpUtils httpUtils = new HttpUtils();
-//    public static String jenkinsUrl = "http://192.168.31.142:8080/";
 
     /**
      * 获取构建xml结果
@@ -40,7 +33,7 @@ public class JenkinsUtil {
      */
     public String getBuildResult(String jobName,String buildNumber){
         String url = JENKINS_URL+"job/"+jobName+"/"+buildNumber+"/api/xml";
-        String result = httpUtils.doPost(url,null,JENKINS_USERNAME,JENKINS_PASSWORD);
+        String result = httpUtils.doPost(url,null,JenkinsConfig.JENKINS_USERNAME,JenkinsConfig.JENKINS_PASSWORD);
         return result;
     }
 
@@ -48,7 +41,7 @@ public class JenkinsUtil {
 
     static{
         try {
-            jenkins= new JenkinsServer(new URI(JENKINS_URL),JENKINS_USERNAME , JENKINS_PASSWORD);
+            jenkins= new JenkinsServer(new URI(JENKINS_URL),JenkinsConfig.JENKINS_USERNAME , JenkinsConfig.JENKINS_PASSWORD);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -319,26 +312,4 @@ public class JenkinsUtil {
         }
         return null;
     }
-
-
-//    public static void main(String[] args) {
-//        JenkinsUtil jenkinsUtil = new JenkinsUtil();
-//        String resultXml = jenkinsUtil.getBuildResult("test","13");
-//
-//        Document document = null;
-//        try {
-//            document = DocumentHelper.parseText(resultXml);
-//        } catch (DocumentException e) {
-//            e.printStackTrace();
-//        }
-//        //获取文档根节点
-//        Element root = document.getRootElement();
-//        List<Element> elementList = root.elements();
-//        for(Element e : elementList){
-//            if(e.attribute("_class")!=null && e.attribute("_class").getValue().equals("hudson.plugins.testng.TestNGTestResultBuildAction")){
-//                int fail = Integer.parseInt(e.element("failCount").getText());
-//                System.out.println(fail);
-//            }
-//        }
-//    }
 }

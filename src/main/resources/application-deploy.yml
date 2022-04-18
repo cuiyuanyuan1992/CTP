@@ -12,3 +12,8 @@ spring:
     host: 127.0.0.1
     port: 6379
     password: 123456
+
+jenkins:
+  host: 192.168.31.143:8080
+  username: admin
+  password: 1136825d669b60f83d2149a022670b98e0
