@@ -13,6 +13,7 @@ spring:
     port: 6379
     password: 123456
 
+#与jenkins系统配置里面的对外访问链接地址一致
 jenkins:
   host: 192.168.31.143:8080
   username: admin
